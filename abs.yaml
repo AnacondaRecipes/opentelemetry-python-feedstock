@@ -5,3 +5,4 @@ upload_channels:
 channels:
   - sfe1ed40
   - services
+  - https://staging.continuum.io/prefect/fs/trove-classifiers-feedstock/pr4/720a69c

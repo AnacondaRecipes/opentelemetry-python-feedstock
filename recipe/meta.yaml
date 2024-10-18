@@ -1,7 +1,7 @@
 {% set author = "open-telemetry" %}
 {% set name = "opentelemetry" %}
-{% set version = "1.15.0" %}
-{% set sha256 = "98b26b1c0c31bf974ddfd5604b45796312ba10b10fb24b2adc05ae999fa32fa8" %}
+{% set version = "1.26.0" %}
+{% set sha256 = "8f5cb2891b18e72ecf1704088ba6cf54292de51127d3cb8f40a6e9774c4d9e35" %}
 {% set urlbase = "https://github.com/" + author + "/" + name + "-python" %}
 
 # We are making heavy use of macros and variables here to ensure a
@@ -42,6 +42,7 @@
         - pip
         - setuptools
         - wheel
+        - hatchling
       run:
         - python
         {% for arg in varargs %}
@@ -82,20 +83,21 @@ package:
 source:
   url: {{ urlbase }}/archive/refs/tags/v{{ version }}.tar.gz
   sha256: {{ sha256 }}
-  patches:
-    # https://github.com/open-telemetry/opentelemetry-python/issues/2778
-    # conda doesn't seem to have this problem
-    - grpcio-version.patch
+  # patches:
+  #   # https://github.com/open-telemetry/opentelemetry-python/issues/2778
+  #   # conda doesn't seem to have this problem
+  #   - grpcio-version.patch
 
 build:
-  number: 2
-  skip: true # [py<37]
+  number: 0
+  skip: true # [py<38]
 
 outputs:
   - name: {{ name }}-api
     {{ header('api', 'API', '') }}
         - deprecated >=1.2.6,<2.0a0
         - setuptools >=16.0
+        - importlib-metadata >=6.0, <=8.5.0
     {{ test_imports('api', '') }}
         - opentelemetry
         - opentelemetry.attributes
@@ -142,120 +144,120 @@ outputs:
         - opentelemetry.proto.trace
         - opentelemetry.proto.version
 
-  - name: {{ name }}-exporter-jaeger-proto-grpc
-    {{ header('exporter-jaeger-proto-grpc', 'Jaeger Protobuf Exporter', 'exporter', 'sdk') }}
-        - {{ grpcio_dep }}
-        - {{ googleapis_dep }}
-    {{ test_imports('exporter-jaeger-proto-grpc', 'exporter', 'pytest-grpc') }}
-        - opentelemetry.exporter.jaeger.proto.grpc
-        - opentelemetry.exporter.jaeger.proto.grpc.gen
-        - opentelemetry.exporter.jaeger.proto.grpc.send
-        - opentelemetry.exporter.jaeger.proto.grpc.translate
-        - opentelemetry.exporter.jaeger.proto.grpc.util
-        - opentelemetry.exporter.jaeger.proto.grpc.version
+  # # - name: {{ name }}-exporter-jaeger-proto-grpc
+  # #   {{ header('exporter-jaeger-proto-grpc', 'Jaeger Protobuf Exporter', 'exporter', 'sdk') }}
+  # #       - {{ grpcio_dep }}
+  # #       - {{ googleapis_dep }}
+  # #   {{ test_imports('exporter-jaeger-proto-grpc', 'exporter', 'pytest-grpc') }}
+  # #       - opentelemetry.exporter.jaeger.proto.grpc
+  # #       - opentelemetry.exporter.jaeger.proto.grpc.gen
+  # #       - opentelemetry.exporter.jaeger.proto.grpc.send
+  # #       - opentelemetry.exporter.jaeger.proto.grpc.translate
+  # #       - opentelemetry.exporter.jaeger.proto.grpc.util
+  # #       - opentelemetry.exporter.jaeger.proto.grpc.version
 
-  - name: {{ name }}-exporter-jaeger-thrift
-    {{ header('exporter-jaeger-thrift', 'Jaeger Thrift Exporter', 'exporter', 'sdk') }}
-        - thrift >=0.10.0
-    {{ test_imports('exporter-jaeger-thrift', 'exporter') }}
-        - opentelemetry.exporter.jaeger.thrift
-        - opentelemetry.exporter.jaeger.thrift.gen
-        - opentelemetry.exporter.jaeger.thrift.translate
-        - opentelemetry.exporter.jaeger.thrift.send
-        - opentelemetry.exporter.jaeger.thrift.version
+  # # - name: {{ name }}-exporter-jaeger-thrift
+  # #   {{ header('exporter-jaeger-thrift', 'Jaeger Thrift Exporter', 'exporter', 'sdk') }}
+  # #       - thrift >=0.10.0
+  # #   {{ test_imports('exporter-jaeger-thrift', 'exporter') }}
+  # #       - opentelemetry.exporter.jaeger.thrift
+  # #       - opentelemetry.exporter.jaeger.thrift.gen
+  # #       - opentelemetry.exporter.jaeger.thrift.translate
+  # #       - opentelemetry.exporter.jaeger.thrift.send
+  # #       - opentelemetry.exporter.jaeger.thrift.version
 
-  - name: {{ name }}-exporter-jaeger
-    {{ header('exporter-jaeger', 'Jaeger Exporters', 'exporter', 'exporter-jaeger-proto-grpc','exporter-jaeger-thrift') }}
-    {{ test_imports('exporter-jaeger', 'exporter') }}
-        - opentelemetry.exporter.jaeger.version
+  # # - name: {{ name }}-exporter-jaeger
+  # #   {{ header('exporter-jaeger', 'Jaeger Exporters', 'exporter', 'exporter-jaeger-proto-grpc','exporter-jaeger-thrift') }}
+  # #   {{ test_imports('exporter-jaeger', 'exporter') }}
+  # #       - opentelemetry.exporter.jaeger.version
 
-  - name: {{ name }}-exporter-opencensus
-    {{ header('exporter-opencensus', 'OpenCensus Exporter', 'exporter', 'sdk') }}
-        - {{ grpcio_dep }}
-        - {{ protobuf_dep }}
-        - opencensus-proto >=0.1.0,<1.0.0a0
-    {{ test_imports('exporter-opencensus', 'exporter') }}
-        - opentelemetry.exporter.opencensus
-        - opentelemetry.exporter.opencensus.trace_exporter
-        - opentelemetry.exporter.opencensus.util
-        - opentelemetry.exporter.opencensus.version
+  # - name: {{ name }}-exporter-opencensus
+  #   {{ header('exporter-opencensus', 'OpenCensus Exporter', 'exporter', 'sdk') }}
+  #       - {{ grpcio_dep }}
+  #       - {{ protobuf_dep }}
+  #       - opencensus-proto >=0.1.0,<1.0.0a0
+  #   {{ test_imports('exporter-opencensus', 'exporter') }}
+  #       - opentelemetry.exporter.opencensus
+  #       - opentelemetry.exporter.opencensus.trace_exporter
+  #       - opentelemetry.exporter.opencensus.util
+  #       - opentelemetry.exporter.opencensus.version
 
-  - name: {{ name }}-exporter-otlp-proto-grpc
-    {{ header('exporter-otlp-proto-grpc', 'Collector Protobuf over gRPC Exporter', 'exporter', 'sdk', 'proto') }}
-        - {{ grpcio_dep }}
-        - {{ googleapis_dep }}
-        - {{ backoff_dep }}
-    {{ test_imports('exporter-otlp-proto-grpc', 'exporter', 'pytest-grpc') }}
-        - opentelemetry.exporter.otlp.proto.grpc
-        - opentelemetry.exporter.otlp.proto.grpc.metric_exporter
-        - opentelemetry.exporter.otlp.proto.grpc.trace_exporter
-        - opentelemetry.exporter.otlp.proto.grpc.exporter
-        - opentelemetry.exporter.otlp.proto.grpc.version
+  # - name: {{ name }}-exporter-otlp-proto-grpc
+  #   {{ header('exporter-otlp-proto-grpc', 'Collector Protobuf over gRPC Exporter', 'exporter', 'sdk', 'proto') }}
+  #       - {{ grpcio_dep }}
+  #       - {{ googleapis_dep }}
+  #       - {{ backoff_dep }}
+  #   {{ test_imports('exporter-otlp-proto-grpc', 'exporter', 'pytest-grpc') }}
+  #       - opentelemetry.exporter.otlp.proto.grpc
+  #       - opentelemetry.exporter.otlp.proto.grpc.metric_exporter
+  #       - opentelemetry.exporter.otlp.proto.grpc.trace_exporter
+  #       - opentelemetry.exporter.otlp.proto.grpc.exporter
+  #       - opentelemetry.exporter.otlp.proto.grpc.version
 
-  - name: {{ name }}-exporter-otlp-proto-http
-    {{ header('exporter-otlp-proto-http', 'Collector Protobuf over HTTP Exporter', 'exporter', 'sdk', 'proto') }}
-        - {{ requests_dep }}
-        - {{ googleapis_dep }}
-        - {{ backoff_dep }}
-    {{ test_imports('exporter-otlp-proto-http', 'exporter', 'responses') }}
-        - opentelemetry.exporter.otlp.proto.http
-        - opentelemetry.exporter.otlp.proto.http.trace_exporter
-        - opentelemetry.exporter.otlp.proto.http.version
+  # - name: {{ name }}-exporter-otlp-proto-http
+  #   {{ header('exporter-otlp-proto-http', 'Collector Protobuf over HTTP Exporter', 'exporter', 'sdk', 'proto') }}
+  #       - {{ requests_dep }}
+  #       - {{ googleapis_dep }}
+  #       - {{ backoff_dep }}
+  #   {{ test_imports('exporter-otlp-proto-http', 'exporter', 'responses') }}
+  #       - opentelemetry.exporter.otlp.proto.http
+  #       - opentelemetry.exporter.otlp.proto.http.trace_exporter
+  #       - opentelemetry.exporter.otlp.proto.http.version
 
-  - name: {{ name }}-exporter-otlp
-    {{ header('exporter-otlp', 'Collector Exporters', 'exporter', 'exporter-otlp-proto-grpc', 'exporter-otlp-proto-http') }}
-    {{ test_imports('exporter-otlp', 'exporter') }}
-        - opentelemetry.exporter.otlp.version
+  # - name: {{ name }}-exporter-otlp
+  #   {{ header('exporter-otlp', 'Collector Exporters', 'exporter', 'exporter-otlp-proto-grpc', 'exporter-otlp-proto-http') }}
+  #   {{ test_imports('exporter-otlp', 'exporter') }}
+  #       - opentelemetry.exporter.otlp.version
 
-  - name: {{ name }}-exporter-prometheus
-    {{ header('exporter-prometheus', 'Prometheus Exporter', 'exporter', 'sdk') }}
-        - prometheus_client >=0.5.0,<1.0.0
-    {{ test_imports('exporter-prometheus', 'exporter') }}
-        - opentelemetry.exporter.prometheus
-        - opentelemetry.exporter.prometheus.version
+  # - name: {{ name }}-exporter-prometheus
+  #   {{ header('exporter-prometheus', 'Prometheus Exporter', 'exporter', 'sdk') }}
+  #       - prometheus_client >=0.5.0,<1.0.0
+  #   {{ test_imports('exporter-prometheus', 'exporter') }}
+  #       - opentelemetry.exporter.prometheus
+  #       - opentelemetry.exporter.prometheus.version
 
-  - name: {{ name }}-exporter-zipkin-json
-    {{ header('exporter-zipkin-json', 'Zipkin JSON Exporter', 'exporter', 'sdk') }}
-        - {{ requests_dep }}
-    {{ test_imports('exporter-zipkin-json', 'exporter') }}
-        - opentelemetry.exporter.zipkin
-        - opentelemetry.exporter.zipkin.encoder
-        - opentelemetry.exporter.zipkin.json
-        - opentelemetry.exporter.zipkin.node_endpoint
+  # - name: {{ name }}-exporter-zipkin-json
+  #   {{ header('exporter-zipkin-json', 'Zipkin JSON Exporter', 'exporter', 'sdk') }}
+  #       - {{ requests_dep }}
+  #   {{ test_imports('exporter-zipkin-json', 'exporter') }}
+  #       - opentelemetry.exporter.zipkin
+  #       - opentelemetry.exporter.zipkin.encoder
+  #       - opentelemetry.exporter.zipkin.json
+  #       - opentelemetry.exporter.zipkin.node_endpoint
 
-  - name: {{ name }}-exporter-zipkin-proto-http
-    {{ header('exporter-zipkin-proto-http', 'Zipkin Protobuf Exporter', 'exporter', 'sdk', 'exporter-zipkin-json') }}
-        - {{ protobuf_dep }}
-        - {{ requests_dep }}
-    {{ test_imports('exporter-zipkin-proto-http', 'exporter') }}
-        - opentelemetry.exporter.zipkin.proto.http
-        - opentelemetry.exporter.zipkin.proto.http.v2
-        - opentelemetry.exporter.zipkin.proto.http.version
+  # - name: {{ name }}-exporter-zipkin-proto-http
+  #   {{ header('exporter-zipkin-proto-http', 'Zipkin Protobuf Exporter', 'exporter', 'sdk', 'exporter-zipkin-json') }}
+  #       - {{ protobuf_dep }}
+  #       - {{ requests_dep }}
+  #   {{ test_imports('exporter-zipkin-proto-http', 'exporter') }}
+  #       - opentelemetry.exporter.zipkin.proto.http
+  #       - opentelemetry.exporter.zipkin.proto.http.v2
+  #       - opentelemetry.exporter.zipkin.proto.http.version
 
-  - name: {{ name }}-exporter-zipkin
-    {{ header('exporter-zipkin', 'Zipkin Exporters', 'exporter', 'exporter-zipkin-json','exporter-zipkin-proto-http') }}
-    {{ test_imports('exporter-zipkin', 'exporter') }}
-        - opentelemetry.exporter.zipkin.version
+  # - name: {{ name }}-exporter-zipkin
+  #   {{ header('exporter-zipkin', 'Zipkin Exporters', 'exporter', 'exporter-zipkin-json','exporter-zipkin-proto-http') }}
+  #   {{ test_imports('exporter-zipkin', 'exporter') }}
+  #       - opentelemetry.exporter.zipkin.version
 
-  - name: {{ name }}-opentracing-shim
-    {{ header('opentracing-shim','OpenTracing Shim', 'shim', 'api') }}
-        - opentracing >=2.0,<3.0.0a0
-    {{ test_imports('opentracing-shim', 'shim') }}
-        - opentelemetry.shim.opentracing_shim
-        - opentelemetry.shim.opentracing_shim.util
-        - opentelemetry.shim.opentracing_shim.version
+  # - name: {{ name }}-opentracing-shim
+  #   {{ header('opentracing-shim','OpenTracing Shim', 'shim', 'api') }}
+  #       - opentracing >=2.0,<3.0.0a0
+  #   {{ test_imports('opentracing-shim', 'shim') }}
+  #       - opentelemetry.shim.opentracing_shim
+  #       - opentelemetry.shim.opentracing_shim.util
+  #       - opentelemetry.shim.opentracing_shim.version
 
-  - name: {{ name }}-propagator-b3
-    {{ header('propagator-b3', 'B3 Propagator', 'propagator', 'api') }}
-    {{ test_imports('propagator-b3', 'propagator') }}
-        - opentelemetry.propagators.b3
-        - opentelemetry.propagators.b3.version
+  # - name: {{ name }}-propagator-b3
+  #   {{ header('propagator-b3', 'B3 Propagator', 'propagator', 'api') }}
+  #   {{ test_imports('propagator-b3', 'propagator') }}
+  #       - opentelemetry.propagators.b3
+  #       - opentelemetry.propagators.b3.version
 
-  - name: {{ name }}-propagator-jaeger
-    {{ header('propagator-jaeger', 'Jaeger Propagator', 'propagator', 'api') }}
-    {{ test_imports('propagator-jaeger', 'propagator') }}
-        - opentelemetry.propagators.jaeger
-        - opentelemetry.propagators.jaeger.version
+  # # - name: {{ name }}-propagator-jaeger
+  # #   {{ header('propagator-jaeger', 'Jaeger Propagator', 'propagator', 'api') }}
+  # #   {{ test_imports('propagator-jaeger', 'propagator') }}
+  # #       - opentelemetry.propagators.jaeger
+  # #       - opentelemetry.propagators.jaeger.version
 
   - name: {{ name }}-test-utils
     {{ header('test-utils', 'Test Utilities', 'tests', 'sdk') }}
